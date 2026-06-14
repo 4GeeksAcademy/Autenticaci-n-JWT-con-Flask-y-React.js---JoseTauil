@@ -20,3 +20,50 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+
+@api.route('/signup', methods=['POST'])
+def signup():
+
+    body = request.get_json()
+
+    email = body.get("email")
+    password = body.get("password")
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return jsonify({"msg": "El usuario ya existe"}), 400
+
+    new_user = User(
+        email=email,
+        password=password,
+        is_active=True
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"msg": "Usuario creado correctamente"}), 201
+
+
+@api.route('/login', methods=['POST'])
+def login():
+
+    body = request.get_json()
+
+    email = body.get("email")
+    password = body.get("password")
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        return jsonify({"msg": "Usuario no existe"}), 401
+
+    if user.password != password:
+        return jsonify({"msg": "Contraseña incorrecta"}), 401
+
+    return jsonify({
+        "msg": "Login correcto",
+        "user": user.serialize()
+    }), 200
