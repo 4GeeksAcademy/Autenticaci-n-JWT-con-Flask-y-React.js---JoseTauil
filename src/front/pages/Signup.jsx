@@ -10,7 +10,7 @@ export const Signup = () => {
     e.preventDefault();
 
     try {
-      const resp = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+      const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -10,32 +10,50 @@ export const Login = () => {
     e.preventDefault();
 
     try {
-      const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
-      });
+      const resp = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
 
       const data = await resp.json();
 
+      // 🔍 DEBUG (IMPORTANTE PARA SABER QUÉ LLEGA)
+      console.log("RESPUESTA BACKEND:", data);
+
+      // ❌ ERROR DE LOGIN
       if (!resp.ok) {
         alert(data.msg || "Error en login");
+        return;
+      }
+
+      // 🚨 VALIDACIÓN DEL TOKEN
+      if (!data.token) {
+        console.error("❌ No se recibió token del backend");
+        alert("Error: el servidor no devolvió token");
         return;
       }
 
       // 🔐 GUARDAR TOKEN
       sessionStorage.setItem("token", data.token);
 
+      // ✔ CONFIRMACIÓN
+      console.log("TOKEN GUARDADO:", sessionStorage.getItem("token"));
+
       // 🚀 REDIRECCIÓN
       navigate("/private");
 
     } catch (error) {
-      console.log(error);
+      console.error("Error en login:", error);
+      alert("Error de conexión con el servidor");
     }
   };
 
